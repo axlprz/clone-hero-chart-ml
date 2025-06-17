@@ -10,7 +10,7 @@ This project uses machine learning to predict suitable biomes for animal species
 - `assets/` – Charts, maps, and visual outputs for the README
 
 ## Results
-- SVM and KNN classifiers trained on bioclimatic variables
+- SVM, KNN, XGBoost, RF classifiers trained on bioclimatic variables
 - Visualizations of predicted biome suitability
 
 ## Future Work
