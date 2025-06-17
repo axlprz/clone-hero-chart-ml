@@ -43,4 +43,42 @@ pip install -r requirements.txt
 
 # Step 2: Run the chart generator
 python main.py --audio "song.ogg" --output "output.chart"
+```
 
+--
+
+## Models Used
+
+All models were trained using parsed .chart labels from real Clone Hero songs:
+
+1. **RandomForestClassifier** = Used for baseline fret prediction from mel features
+2. **CNN** = Custom convolutional network trained on mel + delta + delta-delta spectrograms
+3. **PANNs (CNN14)** = Transfer learning using pretrained waveform embeddings for 2-second audio windows
+
+---
+
+## Results
+
+1. Top-1 fret prediction accuracy: ~25% (PANNs classifier)
+2. Charts align with beats detected using librosa.onset_detect
+3. Support for instrument-specific stem inputs (e.g., guitar = other.wav, bass = bass.wav)
+4. Output playable .chart files that match song rhythm and pitch structure
+
+
+---
+
+## Example Output
+
+Visual example of a generated .chart file opened in Moonscraper Chart Editor.
+
+---
+
+## Future work
+
+1. Add difficulty levels (Easy, Medium, Hard)
+2. Improve quantization and timing alignment with BPM
+3. Add support for more instruments (e.g., drums, vocals)
+4. Incorporate full MIDI training data for improved musicality
+5. Auto-package output for use in Clone Hero without manual setup
+
+---
