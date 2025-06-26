@@ -1,84 +1,109 @@
-# Clone Hero Chart Generator using Machine Learning
+# Automated Chart Generator for Clone Hero
 
-This project generates playable `.chart` files for [Clone Hero](https://clonehero.net/) directly from audio using a machine learning pipeline. It leverages beat detection, instrument separation (Demucs), and fret classification using CNNs and transfer learning with PANNs.
-
----
-
-## Overview
-
-The goal is to automate the creation of rhythm game charts that align closely with a song’s musical structure, reducing manual charting effort while maintaining musical accuracy and playability.
+This project provides a Python-based pipeline to automatically generate playable Clone Hero chart packages from raw audio tracks. By leveraging audio processing libraries (Librosa, Pydub) for onset detection and a trained Random Forest model for fret prediction, it produces valid `.chart` files and packages them alongside converted audio and metadata into song folders compatible with Clone Hero.
 
 ---
 
 ## Project Structure
 
-    clone-hero-chart-ml/
-    ├── data/           # Processed dataset samples or features
-    ├── notebooks/      # Training, testing, and EDA notebooks
-    ├── src/            # Scripts: chart generation, feature extraction, prediction
-    ├── models/         # Trained classifiers (.pt or .pkl)
-    ├── assets/         # Spectrograms, video demos, chart screenshots
-    ├── requirements.txt
-    ├── README.md
-    └── .gitignore
+```text
+clonehero_chart_generator/
+├── audio/                    # Raw input audio files (.mp3, .wav)
+├── charts/                   # Generated .chart files
+├── data/                     # Intermediate data (onsets, segments)
+├── songs/                    # Packaged Clone Hero song folders
+├── src/                      # Source code modules
+│   ├── audio_utils.py        # Audio loading and conversion
+│   ├── onset_detection.py    # Onset extraction logic
+│   ├── chart_writer.py       # .chart file generation
+│   ├── model_utils.py        # Fret classifier loading and inference
+│   └── packager.py           # Song folder packaging
+├── main.py                   # Entry point script
+├── rf_fret_classifier.pkl    # Trained Random Forest fret classifier
+├── requirements.txt          # Python dependencies
+└── README.md                 # This documentation
+``` 
 
 ---
 
-## Pipeline Steps
+## Overview
 
-1. **Input**: Raw audio file (`.ogg`, `.wav`, or `.mp3`)
-2. **Demucs**: Separate stems (e.g., guitar, bass, drums)
-3. **Beat Detection**: Extract onsets using `librosa`
-4. **Feature Extraction**: Use mel spectrograms or CNN14 embeddings
-5. **ML Prediction**: Classify fret positions from audio segments
-6. **Chart Writing**: Generate `.chart` file for Clone Hero
+The pipeline consists of five main stages:
+
+1. **Audio Input**  
+   - User places an audio track in `audio/`.  
+   - Optionally, the track is converted to OGG format via Pydub.
+
+2. **Preprocessing**  
+   - Librosa loads and normalizes the waveform.  
+   - Onset detection extracts key pulsation times.
+
+3. **Chart Generation**  
+   - Onset times are converted to tick indices using estimated BPM and resolution.  
+   - A Random Forest model predicts fret positions for each onset.  
+   - A valid `.chart` file is assembled with `[Song]`, `[SyncTrack]`, and `[ExpertSingle]` sections.
+
+4. **Packaging**  
+   - Audio renamed to `song.ogg`, chart to `notes.chart`, plus a `song.ini` metadata file.  
+   - All files copied into a new folder under `songs/`, ready for Clone Hero.
+
+5. **Machine Learning Enhancements**  
+   - Optional separation of stems (guitar, bass) using Demucs.  
+   - Future integration of supervised models to refine difficulty levels and note durations.
 
 ---
 
-## How to Use
+## Installation
 
+1. Clone the repository and navigate in:
+   ```bash
+   git clone https://github.com/yourusername/clonehero_chart_generator.git
+   cd clonehero_chart_generator
+   ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+---
+
+## Usage
+
+Run the main script to process all audio files in `audio/`:
 ```bash
-# Step 1: Install dependencies
-pip install -r requirements.txt
-
-# Step 2: Run the chart generator
-python main.py --audio "song.ogg" --output "output.chart"
+python main.py --input_dir audio/ --output_dir songs/
 ```
 
---
-
-## Models Used
-
-All models were trained using parsed .chart labels from real Clone Hero songs:
-
-1. **RandomForestClassifier** = Used for baseline fret prediction from mel features
-2. **CNN** = Custom convolutional network trained on mel + delta + delta-delta spectrograms
-3. **PANNs (CNN14)** = Transfer learning using pretrained waveform embeddings for 2-second audio windows
+To process a single file:
+```bash
+python main.py --input audio/song.mp3 --output songs/MyChart
+```
 
 ---
 
 ## Results
 
-1. Top-1 fret prediction accuracy: ~25% (PANNs classifier)
-2. Charts align with beats detected using librosa.onset_detect
-3. Support for instrument-specific stem inputs (e.g., guitar = other.wav, bass = bass.wav)
-4. Output playable .chart files that match song rhythm and pitch structure
-
-
----
-
-## Example Output
-
-Visual example of a generated .chart file opened in Moonscraper Chart Editor.
+- Generates a playable Clone Hero song folder containing:
+  - `song.ogg` (converted audio)
+  - `notes.chart` (game chart)
+  - `song.ini` (metadata)
+- The generated charts align onsets to detected beats; machine-learning-based fret assignments improve playability.
 
 ---
 
-## Future work
+## Future Work
 
-1. Add difficulty levels (Easy, Medium, Hard)
-2. Improve quantization and timing alignment with BPM
-3. Add support for more instruments (e.g., drums, vocals)
-4. Incorporate full MIDI training data for improved musicality
-5. Auto-package output for use in Clone Hero without manual setup
+- Add dynamic BPM detection and tempo tracking.  
+- Integrate supervised learning to predict durations and difficulty tiers.  
+- Support multiple instruments by leveraging separated stems.  
+- Build a GUI for easier user interaction.
 
 ---
+
+## References
+
+- **Clone Hero**: https://clonehero.net/  
+- **Librosa**: https://librosa.org/  
+- **Pydub / FFmpeg**: https://github.com/jiaaro/pydub, https://ffmpeg.org/  
+- **Demucs**: https://github.com/facebookresearch/demucs  
+- **Random Forest**: scikit-learn implementation for fret prediction
