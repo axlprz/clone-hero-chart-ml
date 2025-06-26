@@ -13,13 +13,12 @@ clonehero_chart_generator/
 ├── data/                     # Intermediate data (onsets, segments)
 ├── songs/                    # Packaged Clone Hero song folders
 ├── src/                      # Source code modules
-│   ├── audio_utils.py        # Audio loading and conversion
-│   ├── onset_detection.py    # Onset extraction logic
-│   ├── chart_writer.py       # .chart file generation
-│   ├── model_utils.py        # Fret classifier loading and inference
-│   └── packager.py           # Song folder packaging
+│   ├── beat_detection.py     # Beat and Onset detection logic
+│   ├── chart_generator.py    # .chart note file generator
+│   ├── preprocessing.py      # Audio loading and conversion
+│   └── song_packager.py      # Song folder packaging
 ├── main.py                   # Entry point script
-├── rf_fret_classifier.pkl    # Trained Random Forest fret classifier
+├── rf_fret_classifier.pkl    # Trained Random Forest fret classifier (too large to upload)
 ├── requirements.txt          # Python dependencies
 └── README.md                 # This documentation
 ``` 
